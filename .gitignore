@@ -1,0 +1,9 @@
+# TypeLens has no build step and no dependencies.
+# Nothing here is generated except icons, which are committed intentionally.
+
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.vscode/
+.idea/

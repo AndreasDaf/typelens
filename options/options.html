@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeLens — Settings &amp; Privacy</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="head">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <h1>TypeLens</h1>
+          <p class="sub">Settings &amp; privacy</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- TRACKED SITES -->
+    <section class="card">
+      <h2>Tracked sites</h2>
+      <p class="hint">TypeLens only counts on the sites listed here. Toggle any off, or add your own. Adding a site asks Chrome for permission to run on it.</p>
+      <div id="siteList" class="site-list"></div>
+      <form id="addForm" class="add-row">
+        <input id="addInput" type="text" placeholder="e.g. grok.com or chat.deepseek.com" autocomplete="off" />
+        <button type="submit" class="btn btn-primary">Add site</button>
+      </form>
+      <p id="addError" class="error" hidden></p>
+    </section>
+
+    <!-- ACTIVE HOURS -->
+    <section class="card">
+      <h2>Active hours</h2>
+      <p class="hint">Optionally only count during set hours. If your window ends while you're typing, TypeLens gently asks before stopping — it never cuts you off silently.</p>
+      <label class="switch-row">
+        <span>Only count during set hours</span>
+        <input type="checkbox" id="hoursEnabled" class="switch" />
+      </label>
+      <div id="hoursFields" class="hours-fields">
+        <label>From <input type="time" id="hoursStart" /></label>
+        <label>To <input type="time" id="hoursEnd" /></label>
+      </div>
+    </section>
+
+    <!-- PAUSE -->
+    <section class="card">
+      <h2>Pause</h2>
+      <p class="hint">Pause counting anytime with the keyboard shortcut <kbd id="shortcut">Ctrl+Shift+U</kbd>, from the popup, or here.</p>
+      <label class="switch-row">
+        <span>Pause all counting</span>
+        <input type="checkbox" id="pausedToggle" class="switch" />
+      </label>
+    </section>
+
+    <!-- YOUR DATA -->
+    <section class="card">
+      <h2>Your data</h2>
+      <p class="hint">Everything lives on this device. Export a copy or erase it all — your call, instantly, no questions asked.</p>
+      <div class="btn-row">
+        <button id="exportBtn" class="btn">Export my data (JSON)</button>
+        <button id="deleteBtn" class="btn btn-danger">Delete everything</button>
+      </div>
+      <p id="dataMsg" class="ok" hidden></p>
+    </section>
+
+    <!-- PRIVACY -->
+    <section class="card privacy">
+      <h2>What happens to every keystroke</h2>
+      <p>This is the whole story, in plain language. The code backs up every sentence — it's open source, read it.</p>
+      <ol class="lifecycle">
+        <li><b>You press a key.</b> A listener notices a key went down inside a text field.</li>
+        <li><b>It asks one yes/no question:</b> "was that a single printable character?" It checks the length of the key — never which key it was.</li>
+        <li><b>If yes, a number goes up by one.</b> That number is the only thing that exists. The keystroke itself is already gone.</li>
+        <li><b>Every couple of seconds, that number is added to a daily total</b> for the site you're on, saved in your browser's local storage.</li>
+        <li><b>That's it. Forever.</b> The data model is: dates → site names → counts. There is nowhere for your words to live, because nothing ever holds them.</li>
+      </ol>
+      <div class="promises">
+        <div class="promise"><span class="pdot"></span> No text is ever stored, anywhere.</div>
+        <div class="promise"><span class="pdot"></span> No network requests. No servers. No accounts. No sync.</div>
+        <div class="promise"><span class="pdot"></span> Works fully offline, identically, forever.</div>
+        <div class="promise"><span class="pdot"></span> Open source — every line is auditable.</div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span class="muted">TypeLens v<span id="version">1.0.0</span> · runs entirely on your device</span>
+    </footer>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

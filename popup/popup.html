@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeLens</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">TypeLens</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="pauseBtn" class="icon-btn" title="Pause counting">
+        <span id="pauseIcon" class="pause-glyph"></span>
+      </button>
+      <button id="settingsBtn" class="icon-btn" title="Settings">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94a7.49 7.49 0 0 0 .05-.94 7.49 7.49 0 0 0-.05-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7 7 0 0 0-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.29 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.03.31-.05.62-.05.94s.02.63.05.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.61.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.04.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.58-.24 1.12-.56 1.62-.94l2.39.96c.19.1.47.02.61-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="pausedBanner" class="paused-banner" hidden>
+    Counting is paused. <button id="resumeBtn" class="link-btn">Resume</button>
+  </div>
+
+  <nav class="scopes" id="scopes">
+    <button class="scope" data-scope="today">Today</button>
+    <button class="scope" data-scope="week">Week</button>
+    <button class="scope" data-scope="month">Month</button>
+    <button class="scope is-active" data-scope="all">All time</button>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-number" id="heroNumber">0</div>
+    <div class="hero-label">characters typed <span id="heroScopeLabel">all time</span></div>
+    <div class="hero-equiv" id="heroEquiv">≈ 0 words</div>
+  </section>
+
+  <section class="equiv-grid" id="equivGrid"></section>
+
+  <section class="block">
+    <h2 class="block-title">By platform</h2>
+    <div class="platforms" id="platforms"></div>
+  </section>
+
+  <section class="block">
+    <h2 class="block-title">Activity <span class="muted" id="gridRange"></span></h2>
+    <div class="grid-wrap">
+      <div class="grid" id="activityGrid"></div>
+    </div>
+    <div class="grid-legend">
+      <span>Less</span>
+      <span class="leg l0"></span>
+      <span class="leg l1"></span>
+      <span class="leg l2"></span>
+      <span class="leg l3"></span>
+      <span class="leg l4"></span>
+      <span>More</span>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span id="sinceLabel" class="muted"></span>
+    <button id="footerSettings" class="link-btn">Settings &amp; privacy</button>
+  </footer>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
