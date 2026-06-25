@@ -39,12 +39,30 @@
     <div class="hero-equiv" id="heroEquiv">≈ 0 words</div>
   </section>
 
-  <div class="compare-row">
-    <span class="compare-label">Compare to</span>
-    <div class="pills" id="universePills"></div>
-  </div>
+  <button class="compare-btn" id="compareBtn" aria-haspopup="dialog" aria-expanded="false">
+    <span class="compare-btn-text">
+      <span class="compare-btn-label">Compare to</span>
+      <span class="compare-btn-value" id="compareBtnValue">Harry Potter</span>
+    </span>
+    <svg class="compare-btn-chevron" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 6l5 5 5-5"/>
+    </svg>
+  </button>
 
   <section class="universe-panel" id="universePanel"></section>
+
+  <!-- Universe picker overlay -->
+  <div id="universePicker" class="universe-picker" hidden role="dialog" aria-label="Choose universe">
+    <div class="picker-header">
+      <span class="picker-title">Compare to…</span>
+      <button id="closePickerBtn" class="icon-btn" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="picker-list" id="universeList"></div>
+  </div>
 
   <section class="block">
     <h2 class="block-title">By platform</h2>

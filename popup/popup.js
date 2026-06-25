@@ -47,7 +47,7 @@ function scopeTotal() {
 function render() {
   renderPaused();
   renderScopes();
-  renderPills();
+  renderCompareBtn();
   renderHero();
   renderUniverse();
   renderPlatforms();
@@ -68,10 +68,41 @@ function renderScopes() {
   });
 }
 
-function renderPills() {
-  $('universePills').innerHTML = UNIVERSES.map(
-    (u) => `<button class="pill ${u.id === state.universeId ? 'is-active' : ''}" data-id="${u.id}">${escapeHtml(u.pill)}</button>`
-  ).join('');
+function renderCompareBtn() {
+  const universe = getUniverse(state.universeId);
+  $('compareBtnValue').textContent = universe.label;
+}
+
+const UNIVERSE_DESC = {
+  hp:       '7 books · 6.4M characters',
+  lotr:     'Hobbit + trilogy · 5.3M characters',
+  got:      '5 books · 9.1M characters',
+  classics: 'Gatsby → 1984 → War and Peace',
+  academic: 'College essay → paper → PhD thesis',
+  internet: 'Tweet → Reddit post → Wikipedia',
+  random:   'Sandwiches, IKEA names, sticky notes & more',
+};
+
+function showPicker() {
+  const el = $('universePicker');
+  el.hidden = false;
+  $('compareBtn').setAttribute('aria-expanded', 'true');
+  $('universeList').innerHTML = UNIVERSES.map((u) => `
+    <button class="picker-item${u.id === state.universeId ? ' is-selected' : ''}" data-id="${u.id}">
+      <span class="picker-dot"></span>
+      <span class="picker-item-body">
+        <span class="picker-item-name">${escapeHtml(u.label)}</span>
+        <span class="picker-item-desc">${escapeHtml(UNIVERSE_DESC[u.id] || '')}</span>
+      </span>
+      <svg class="picker-check" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M2.5 9l4 4 7-8"/>
+      </svg>
+    </button>`).join('');
+}
+
+function closePicker() {
+  $('universePicker').hidden = true;
+  $('compareBtn').setAttribute('aria-expanded', 'false');
 }
 
 function renderHero() {
@@ -198,15 +229,19 @@ $('scopes').addEventListener('click', (e) => {
   render();
 });
 
-$('universePills').addEventListener('click', async (e) => {
-  const btn = e.target.closest('.pill');
+$('compareBtn').addEventListener('click', showPicker);
+$('closePickerBtn').addEventListener('click', closePicker);
+
+$('universeList').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.picker-item');
   if (!btn) return;
   state.universeId = btn.dataset.id;
-  renderPills();
-  renderHero();
-  renderUniverse();
   state.settings.universe = state.universeId;
   await setSettings(state.settings);
+  closePicker();
+  renderCompareBtn();
+  renderHero();
+  renderUniverse();
 });
 
 async function togglePause() {
