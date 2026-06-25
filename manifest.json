@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TypeLens",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Privately count how much you've actually typed to AI tools. Local-only. No text is ever stored. No data ever leaves your device.",
   "author": "TypeLens",
   "minimum_chrome_version": "102",

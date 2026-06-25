@@ -3,41 +3,53 @@
 import {
   formatNumber,
   formatCompact,
-  equivalents,
-  heroEquivalent,
+  formatPercent,
   parseDayKey,
+  UNIVERSES,
+  FUN_ITEMS,
+  getUniverse,
+  bestEquivalent,
+  universeStats,
+  funEquivalent,
 } from '../src/shared/constants.js';
 import { getSettings, getDays, getMeta, setSettings, summarize, gridSeries } from '../src/shared/stats.js';
 
 const $ = (id) => document.getElementById(id);
 
-let state = {
+const state = {
   scope: 'all',
+  universeId: 'hp',
+  funIndex: null,
   summary: null,
+  grid: null,
   settings: null,
+  meta: null,
 };
 
 async function load() {
   const [settings, days, meta] = await Promise.all([getSettings(), getDays(), getMeta()]);
   state.settings = settings;
+  state.universeId = settings.universe || 'hp';
+  if (state.funIndex == null) state.funIndex = Math.floor(Math.random() * FUN_ITEMS.length);
   state.summary = summarize(days, settings.sites);
-  state.grid = gridSeries(days, 26);
+  state.grid = gridSeries(days, 13); // ~90 days, 13 week-columns
   state.meta = meta;
   render();
 }
+
+const SCOPE_LABELS = { today: 'today', week: 'this week', month: 'this month', all: 'all time' };
 
 function scopeTotal() {
   const s = state.summary;
   return { today: s.today, week: s.week, month: s.month, all: s.all }[state.scope];
 }
 
-const SCOPE_LABELS = { today: 'today', week: 'this week', month: 'this month', all: 'all time' };
-
 function render() {
   renderPaused();
   renderScopes();
+  renderPills();
   renderHero();
-  renderEquivGrid();
+  renderUniverse();
   renderPlatforms();
   renderGrid();
   renderFooter();
@@ -56,27 +68,78 @@ function renderScopes() {
   });
 }
 
+function renderPills() {
+  $('universePills').innerHTML = UNIVERSES.map(
+    (u) => `<button class="pill ${u.id === state.universeId ? 'is-active' : ''}" data-id="${u.id}">${escapeHtml(u.pill)}</button>`
+  ).join('');
+}
+
 function renderHero() {
   const total = scopeTotal();
   $('heroNumber').textContent = total >= 100000 ? formatCompact(total) : formatNumber(total);
   $('heroNumber').title = formatNumber(total) + ' characters';
   $('heroScopeLabel').textContent = SCOPE_LABELS[state.scope];
-  $('heroEquiv').textContent = '≈ ' + heroEquivalent(total);
+
+  const universe = getUniverse(state.universeId);
+  const equiv = $('heroEquiv');
+  if (universe.kind === 'fun') {
+    // The fun card below is the star; a long fun sentence would overflow this
+    // pill, so hide it in Random mode rather than duplicate the text.
+    equiv.style.display = 'none';
+  } else {
+    equiv.style.display = 'inline-block';
+    equiv.textContent = '≈ ' + bestEquivalent(total, universe);
+  }
 }
 
-function renderEquivGrid() {
+function renderUniverse() {
   const total = scopeTotal();
-  const order = ['words', 'pages', 'essays', 'chapters', 'books', 'series'];
-  const picks = equivalents(total)
-    .sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key))
-    .slice(0, 6);
-  const html = picks
-    .map((e) => {
-      const v = e.value >= 100 ? formatCompact(e.value) : e.value >= 10 ? Math.round(e.value) : Math.round(e.value * 10) / 10;
-      return `<div class="equiv-card"><div class="v">${typeof v === 'number' ? v.toLocaleString('en-US') : v}</div><div class="k">${e.label}</div></div>`;
-    })
-    .join('');
-  $('equivGrid').innerHTML = html;
+  const universe = getUniverse(state.universeId);
+  const el = $('universePanel');
+
+  if (universe.kind === 'fun') {
+    el.innerHTML = `
+      <div class="up-card fun-card">
+        <div class="fun-text"><span class="lead">You've typed…</span>${escapeHtml(capitalize(funEquivalent(total, state.funIndex)))}</div>
+        <button class="shuffle-btn" id="shuffleBtn" title="Shuffle" aria-label="Shuffle">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18 4l3 3-3 3v-2h-2.5l-2.3 3.2-1.2-1.7 1.9-2.7A1 1 0 0 1 14.6 9H18V7H6V5h12V4zm0 16l3-3-3-3v2h-3.4a1 1 0 0 1-.8-.4l-6-8.4A1 1 0 0 0 6.9 7H3v2h3.4l6 8.4a1 1 0 0 0 .8.4H18v2z"/></svg>
+        </button>
+      </div>`;
+    $('shuffleBtn').addEventListener('click', () => {
+      state.funIndex = (state.funIndex + 1) % FUN_ITEMS.length;
+      renderUniverse();
+      renderHero();
+    });
+    return;
+  }
+
+  const st = universeStats(total, universe);
+  const headline = `<b>${escapeHtml(universe.totalPhrase)}</b> contains ${formatNumber(st.total)} characters.`;
+
+  const nowLabel = st.reached ? st.reached.label : 'Just getting started';
+  const nextLabel = st.complete
+    ? fmtMultiplier(st.multiplier) > 1
+      ? `Complete · ${fmtMultiplier(st.multiplier)}× over`
+      : 'Complete 🎉'
+    : st.next
+    ? `Next: ${st.next.label}`
+    : 'Complete';
+
+  el.innerHTML = `
+    <div class="up-card">
+      <div class="up-headline">${headline}</div>
+      <div class="up-pct">
+        <span class="big">${formatPercent(st.pct)}%</span>
+        <span class="of">of that, written to AI tools</span>
+      </div>
+      <div class="up-progress">
+        <div class="up-track"><div class="up-fill" style="width:${Math.max(2, st.segmentPct)}%"></div></div>
+        <div class="up-milestones">
+          <span class="up-now">${escapeHtml(nowLabel)}</span>
+          <span class="up-next">${escapeHtml(nextLabel)}</span>
+        </div>
+      </div>
+    </div>`;
 }
 
 function renderPlatforms() {
@@ -114,16 +177,10 @@ function renderGrid() {
   $('activityGrid').innerHTML = cells
     .map((c) => {
       const lv = level(c.total);
-      const label =
-        c.total == null
-          ? ''
-          : `${formatNumber(c.total)} characters on ${formatDate(c.date)}`;
+      const label = c.total == null ? '' : `${formatNumber(c.total)} characters on ${formatDate(c.date)}`;
       return `<span class="cell ${lv}" title="${label}"></span>`;
     })
     .join('');
-
-  const first = cells.find((c) => c.total != null);
-  if (first) $('gridRange').textContent = `· last 6 months`;
 }
 
 function renderFooter() {
@@ -141,6 +198,17 @@ $('scopes').addEventListener('click', (e) => {
   render();
 });
 
+$('universePills').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.pill');
+  if (!btn) return;
+  state.universeId = btn.dataset.id;
+  renderPills();
+  renderHero();
+  renderUniverse();
+  state.settings.universe = state.universeId;
+  await setSettings(state.settings);
+});
+
 async function togglePause() {
   state.settings.paused = !state.settings.paused;
   await setSettings(state.settings);
@@ -153,12 +221,21 @@ $('resumeBtn').addEventListener('click', togglePause);
 $('settingsBtn').addEventListener('click', () => chrome.runtime.openOptionsPage());
 $('footerSettings').addEventListener('click', () => chrome.runtime.openOptionsPage());
 
-// Live-update if counts or settings change while the popup is open.
+// Live-update if counts change while the popup is open. We ignore our own
+// settings writes (universe/pause) to avoid clobbering local UI state.
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && (changes.tl_days || changes.tl_settings)) load();
+  if (area === 'local' && changes.tl_days) load();
 });
 
 // --- utils ---
+
+function fmtMultiplier(m) {
+  return m >= 10 ? Math.round(m) : Math.round(m * 10) / 10;
+}
+
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
 
 function formatDate(d) {
   const date = d instanceof Date ? d : parseDayKey(d);

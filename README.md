@@ -61,9 +61,10 @@ Chrome for permission to run on just that site.
 
 ## Features
 - **Scopes:** today / this week / this month / all time.
-- **Equivalents:** words, pages, essays, Harry Potter chapters, novels, whole HP series.
-- **Per-platform breakdown** with a simple bar chart.
-- **Activity grid** — your last 6 months, contribution-graph style.
+- **Compare-to universes:** see your total as a share of the Harry Potter series, Lord of the Rings, A Song of Ice and Fire, classic literature, academic writing, or the internet — with a book-by-book progression bar that knows what comes next ("Book 3 done, next: Book 4") and a prominent "you've written X% of it" headline.
+- **Random & Fun mode:** the same number as sandwiches you could name, IKEA products, passive-aggressive sticky notes, and more — with a shuffle button.
+- **Per-platform breakdown** with a compact bar chart.
+- **Activity grid** — your last 90 days, contribution-graph style, fitted to the popup.
 - **Pause** with `Ctrl+Shift+U` (⌘⇧U on Mac), from the popup, or in Settings.
 - **Active hours** — only count during set hours; if your window ends mid-sentence, it asks before stopping.
 - **Export** your data as JSON, or **delete everything** instantly.
